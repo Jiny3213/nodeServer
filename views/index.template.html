@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>树莓派社区</title>
+		<link rel="stylesheet" href="../public/css/main.css">
+		<script src="../public/js/vue.js"></script>
+	</head>
+	<body>
+		<header>
+			<img src="../public/img/raspberry_logo.png" >
+			<span id="headname">Jinyuu树莓派社区</span>
+			<a href="/login" id="login">登录</a>
+			<a href="/register" id="register">注册</a>
+			<div id="nickname" 
+			v-on:mouseover="show_user_li"
+			v-on:mouseleave="hide_user_li">
+				<span>{{ nickname }}</span>
+				<ul v-bind:style="{display: display_user_li}">
+					<li>修改信息</li>
+					<li><a href="/logout">退出登录</a></li>
+				</ul>
+			</div>
+			<div id="avatar">头像</div>
+		</header>
+		<!--vue-ssr-outlet-->
+		<script src="../public/js/main.js"></script>
+	</body>
+</html>
