@@ -1,28 +1,31 @@
 const jwt = require('../common/jwtConfig.js')
 
-module.exports = function(req, res, next) {
+function checkLogin(req, res, next) {
   var token = req.headers.authorization
   if(token) {
+    // token 中有email和username
     jwt.parseToken(token)
       .then(data => {
-        console.log(`来自已登录用户${data.username}的请求`)
-        res.status(200).json({
-          msg: 'ok',
-          user: {username: data.username}
-        })
+        // 为req新增一个属性，可以取到token信息
+        req.tokenData = data
+        console.log(`已登录用户${data.username}请求登录操作`)
+        next()
       })
       .catch(err => {
-        console.log('来自非法用户的请求')
-        res.status(200).json({
-          msg: 'unavailable'
-        })
+        if(err) {
+          console.log(`${err.message}: token非法或过期`)
+          res.status(200).json({
+            msg: 'login'
+          })
+        }
       })
   }
   else {
     console.log('用户未登录')
     res.status(200).json({
-      msg: 'nolog'
+      msg: 'nologin'
     })
   }
-  
 }
+
+module.exports = {checkLogin}

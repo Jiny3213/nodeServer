@@ -1,15 +1,9 @@
 const jwt = require('../common/jwtConfig.js')
+var express = require('express')
+var router = express.Router()
 
 function test(req, res) {
-  console.log(req.cookie)
-  if(req.session.user) {
-    console.log(req.session.user.username)
-    console.log(req.cookie)
-    res.status(200).json({
-      code: 'good'
-    })
-  }
-  else {
+  if(req.headers.authorization) {
     jwt.parseToken(req.headers.authorization)
       .then(data => {
         res.status(200).json({
@@ -24,6 +18,13 @@ function test(req, res) {
         })
       })
   }
+  else {
+    res.status(200).json({
+      msg: 'error'
+    })
+    console.log('testing')
+  }
 }
+router.get('/test', test)
 
-module.exports = test
+module.exports = router

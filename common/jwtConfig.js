@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 
-const jwtSecret = 'hahaha'
-const expireTime = '2h'
+const {jwtSecret} = require('../secret.js')
+const expireTime = '24h'
 
 function signToken(data) {
   return jwt.sign(data, jwtSecret, {

@@ -1,0 +1,36 @@
+{
+  "currentId": 1,
+  "topics": [
+    {
+      "header": {
+        "id": 1,
+        "author": "Jiny",
+        "tag": "分享",
+        "status": "1",
+        "title": "值得关注的64位系统",
+        "browsed": 999,
+        "prefer": 99,
+        "timestamp": 1571127489350
+      },
+      "content": "\"<p><span style=\\\"font-weight: bold;\\\">asdasdasdas</span></p>\"",
+      "comments": [
+        {
+          "floor": 1,
+          "status": 0,
+          "commenter": "狗蛋",
+          "timestamp": 1571127489350,
+          "content": "评论字数限制140",
+          "prefer": 12
+        },
+        {
+          "floor": 2,
+          "status": 0,
+          "commenter": "狗蛋abc",
+          "timestamp": 1571127489350,
+          "content": "评论字数限制按时打算大所大所大所140",
+          "prefer": 99
+        }
+      ]
+    }
+  ]
+}

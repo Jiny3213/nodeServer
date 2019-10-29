@@ -1,11 +1,13 @@
 const jwt = require('../common/jwtConfig')
-const pfs = require('../common/promiseFs.js')
+const express = require('express')
+const router = express.Router()
+const {createUser, testExist} = require('../db/userCRUD.js')
 
 var isEmailAvailable = false
 var isUsernameAvailable = false
 var isPasswordAvailable = false
 
-// 验证邮箱
+// 验证邮箱(非空，长度，是否符合正则)
 function verifyEmail(email) {
   if(!email || email.length > 30) {
     isEmailAvailable = false
@@ -18,7 +20,7 @@ function verifyEmail(email) {
     isEmailAvailable = false
   }
 }
-//验证昵称(不验证重名)
+//验证昵称(非空，长度，不含空格)
 function verifyUsername(username) {
   if(!username || username.length < 2 || username.length > 10 || /\s/.test(username)) {
     isUsernameAvailable = false
@@ -27,7 +29,7 @@ function verifyUsername(username) {
     isUsernameAvailable = true
   }
 }
-// 验证密码
+// 验证密码（非空，长度，不含空格）
 function verifyPassword(password) {
   if(!password || password.length < 6 || password.length > 12 || /\s/.test(password)) {
     isPasswordAvailable = false
@@ -42,52 +44,73 @@ function verifyUser({username, email, password}){
   verifyUsername(username)
   verifyPassword(password)
   if(isEmailAvailable && isUsernameAvailable && isPasswordAvailable) {
-    console.log('长度没问题')
     return true
   }
 }
 
-function register(req, res) {
+// 注册
+router.post('/register', function(req, res) {
 	var user = {username, email, password} = req.body
 	console.log(`${username}正在注册`)
   // 验证注册信息是否合法
   if(!verifyUser(user)) {
-    console.log('长度有问题')
+    console.log('越过前端校验的非法注册！！')
     res.status(403).json({
       msg: 'fail'
     })
     return
   }
-  pfs.readFile('../db/users.json')
-    .then(usersJson => {
-      var usersArr = JSON.parse(usersJson)
-      // 验证用户是否重名
-      if(usersArr.find(u => u.username == username)) {
-        console.log('重名注册')
-        res.status(403).json({
-          msg: 'fail'
-        })
-        return
-      }
-      usersArr.push(user)
-      pfs.writeFile('../db/users.json', JSON.stringify(usersArr))
-      .then(() => {
-        // 注册成功，发送token
-        res.status(200).json({
-        	msg: 'ok',
-          token: jwt.signToken(user),
-          user: {
-            username
-          }
-        })
+  createUser(user).then(err => {
+    if(!err) {
+      // 注册成功，发送token
+      res.status(200).json({
+      	msg: 'ok',
+        token: jwt.signToken({
+          email: email,
+          username: username
+        }),
+        user: {
+          username
+        }
       })
-      .catch(err => console.log(err))
-    })
-    .catch(err => {
-      console.log(err)
-    })
-	//加密密码
-	// body.password = md5(md5(body.password))
-}
+      return
+    }
+    if(err.errType == 'duplicate') {
+      // 用户名重复
+      if(err.errKey == 'username') {
+        res.status(200).json({
+          msg: 'fail',
+          err: 'username'
+        })
+      }
+      // 邮箱重复
+      else if(err.errKey == 'email') {
+        res.status(200).json({
+          msg: 'fail',
+          err: 'email'
+        })
+      }
+    }
+  })
+})
 
-module.exports = register
+// 验证用户名/邮箱是否存在
+router.get('/api/testexist', function(req, res) {
+  var key = req.query.key
+  var value = req.query.value
+  testExist({key, value}).then(msg => {
+    if(msg) {
+      // 重复
+      res.status(200).json({
+        msg: 'fail'
+      })
+    }
+    else {
+      res.status(200).json({
+        msg: 'ok'
+      })
+    }
+  })
+})
+
+module.exports = router
