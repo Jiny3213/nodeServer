@@ -2,6 +2,8 @@ var express = require('express')
 var path = require('path')
 var bodyParser = require('body-parser')
 var session = require('express-session')
+var fs = require('fs')
+const {PORT} = require('./config')
 
 var router = require('./router/router.js')
 
@@ -39,10 +41,11 @@ server.use(session({
 
 // 允许跨域访问
 server.all('*', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
-  //Access-Control-Allow-Headers ,可根据浏览器的F12查看,把对应的粘贴在这里就行
+  res.header('Access-Control-Allow-Origin', 'http://localhost:8080')
   res.header('Access-Control-Allow-Headers', 'Content-Type, authorization')
   res.header('Access-Control-Allow-Methods', '*')
+  // 允许跨域的cookie
+  res.header('Access-Control-Allow-Credentials', 'true')
   res.header('Content-Type', 'application/json;charset=utf-8')
   next()
 })
@@ -61,9 +64,7 @@ server.use(router)
 // 	console.log('报错了')
 // })
 
-server.listen(8888, function() {
-	console.log('服务器开始运行：localhost:8888')
+server.listen(PORT, function() {
+	console.log(`服务器开始运行：端口${PORT}`)
 })
-// server.listen(80, function() {
-// 	console.log('服务器开始运行：http://101.132.237.93')
-// })
+

@@ -2,6 +2,7 @@ const jwt = require('../common/jwtConfig')
 const express = require('express')
 const router = express.Router()
 const {createUser, testExist} = require('../db/userCRUD.js')
+const svgCaptcha = require('svg-captcha')
 
 var isEmailAvailable = false
 var isUsernameAvailable = false
@@ -50,7 +51,15 @@ function verifyUser({username, email, password}){
 
 // 注册
 router.post('/register', function(req, res) {
-	var user = {username, email, password} = req.body
+	var user = {username, email, password, captcha} = req.body
+  // 验证码错误
+  if(captcha !== req.session.captcha) {
+    res.status(200).json({
+      msg: 'captcha wrong'
+    })
+    return
+  }
+  
 	console.log(`${username}正在注册`)
   // 验证注册信息是否合法
   if(!verifyUser(user)) {
