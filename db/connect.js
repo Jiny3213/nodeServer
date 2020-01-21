@@ -12,18 +12,29 @@ mongoose.set('useFindAndModify', false)
 mongoose.set('useUnifiedTopology', true)
 mongoose.set('useNewUrlParser', true)
 
-// mongoose.connect('mongodb://localhost/test')
-mongoose.connect('mongodb://101.132.237.93:27017/forum', {
+const forum = mongoose.createConnection('mongodb://101.132.237.93:27017/forum', {
   authSource: 'admin',
   user: USER,
   pass: PASSWORD
 })
 
-var db = mongoose.connection
-db.on('error', console.error.bind(console, 'connection error'))
-db.once('open', function() {
-  console.log('数据库连接成功')
+const jinyuu = mongoose.createConnection('mongodb://101.132.237.93:27017/jinyuu', {
+  authSource: 'admin',
+  user: USER,
+  pass: PASSWORD
 })
 
-module.exports = db
+// const db = forum.connection
+forum.on('error', console.error.bind(console, 'connection error'))
+forum.once('open', function() {
+  console.log('数据库forum连接成功')
+})
+
+// const jinyuuDB = jinyuu.connection
+jinyuu.on('error', console.error.bind(console, 'connection error'))
+jinyuu.once('open', function() {
+  console.log(`数据库jinyuu连接成功`)
+})
+
+module.exports = {forum, jinyuu}
 

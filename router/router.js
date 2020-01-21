@@ -1,5 +1,5 @@
-var express = require('express')
-var router = express.Router()
+const express = require('express')
+const router = express.Router()
 
 // 导入路由模块
 const login = require('./login.js')
@@ -8,6 +8,7 @@ const test = require('./test.js')
 const getData = require('./getData')
 const sendData = require('./sendData')
 const modify = require('./modify')
+const webc = require('./jinyuu/webc')
 
 // 注册
 router.use(register)
@@ -26,5 +27,8 @@ router.use(modify)
 
 // 测试
 router.use(test)
+
+// 网站收藏
+router.use(webc)
 
 module.exports = router
